@@ -8,3 +8,4 @@ script = ExtResource("1_0xm2m")
 baseTileScene = ExtResource("2_h2yge")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(545, 295)
