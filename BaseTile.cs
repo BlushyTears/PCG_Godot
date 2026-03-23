@@ -9,6 +9,7 @@ public partial class BaseTile : TextureRect
 
     public void SetTexture(int idx)
     {
+        ZIndex = 0;
         Texture = textures[idx];
         tilesize = Texture.GetSize();
     }

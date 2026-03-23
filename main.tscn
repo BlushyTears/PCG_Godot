@@ -8,4 +8,33 @@ script = ExtResource("1_0xm2m")
 baseTileScene = ExtResource("2_h2yge")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(545, 295)
+position = Vector2(567, 315)
+
+[node name="Generate noise" type="Button" parent="."]
+z_index = 1
+offset_left = 548.0
+offset_top = 577.0
+offset_right = 628.0
+offset_bottom = 608.0
+text = "Generate"
+
+[node name="Clear" type="Button" parent="."]
+z_index = 1
+offset_left = 666.0
+offset_top = 577.0
+offset_right = 715.0
+offset_bottom = 608.0
+text = "Clear
+"
+
+[node name="Apply Celluar Automata" type="Button" parent="."]
+z_index = 1
+offset_left = 386.0
+offset_top = 577.0
+offset_right = 519.0
+offset_bottom = 608.0
+text = "Apply Algorithm"
+
+[connection signal="pressed" from="Generate noise" to="." method="Generate"]
+[connection signal="pressed" from="Clear" to="." method="Clear"]
+[connection signal="pressed" from="Apply Celluar Automata" to="." method="ApplyAlgo"]

@@ -10,13 +10,15 @@ public partial class PCG_Manager : Node2D
     private int tileSize;
     public override void _Ready()
     {
-        createTile(0, new Vector2(0, 0));
-        createTile(0, new Vector2(1, 0));
-        createTile(0, new Vector2(0, 1));
-        createTile(1, new Vector2(1, 1));
-
-        var v = GetTile(new Vector2(0, 0));
-        GD.Print("v after: ", v);
+        Random random = new Random();
+        for(int i = 0; i < 18; i++)
+        {
+            for(int j = 0; j < 10; j++)
+            {
+                int rnd = random.Next(0, 2);
+                createTile(rnd, new Vector2(i, j));
+            }
+        }
     }
 
     public BaseTile GetTile(Vector2 pos)
@@ -35,7 +37,20 @@ public partial class PCG_Manager : Node2D
         tile.SetPosition(pos);
 
         tileset.Add(tile);
+    }
 
-        GD.Print("v before: ", tile);
+    void Generate()
+    {
+        GD.Print("Generate btn");        
+    }
+
+    void Clear()
+    {
+        GD.Print("Clear btn");        
+    }
+
+    void ApplyAlgo()
+    {
+        GD.Print("Algo btn");        
     }
 }
