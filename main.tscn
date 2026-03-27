@@ -12,11 +12,11 @@ position = Vector2(567, 315)
 
 [node name="Generate noise" type="Button" parent="."]
 z_index = 1
-offset_left = 548.0
+offset_left = 530.0
 offset_top = 577.0
-offset_right = 628.0
+offset_right = 652.0
 offset_bottom = 608.0
-text = "Generate"
+text = "Generate Noise"
 
 [node name="Clear" type="Button" parent="."]
 z_index = 1

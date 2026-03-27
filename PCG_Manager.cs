@@ -2,30 +2,17 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-
 public partial class PCG_Manager : Node2D
 {
     [Export] private PackedScene baseTileScene;
     private List<BaseTile> tileset = new List<BaseTile>();
-    private int tileSize;
     private const int horizontalTileCount = 18;
-    private const int vertocalTileCount = 10;
-    public override void _Ready()
-    {
-        Random random = new Random();
-        for(int i = 0; i < horizontalTileCount; i++)
-        {
-            for(int j = 0; j < vertocalTileCount; j++)
-            {
-                int rnd = random.Next(0, 2);
-                createTile(rnd, new Vector2(i, j));
-            }
-        }
-    }
+    private const int verticalTilecount = 10;
+    private int _liveNeighboursRequired = 4;
 
     public BaseTile GetTile(Vector2 pos)
     {
-        int idx = (int)pos.Y * tileSize + (int)pos.X;    
+        int idx = (int)pos.Y * horizontalTileCount + (int)pos.X;    
         return tileset[idx];
     }
 
@@ -41,44 +28,98 @@ public partial class PCG_Manager : Node2D
         tileset.Add(tile);
     }
 
+    // Copied (And converted to 1d array) from: https://bronsonzgeb.com/index.php/2022/01/30/procedural-generation-with-cellular-automata/
+    int GetNeighbourCellCount(int x, int y)
+    {
+        int neighbourCellCount = 0;
+
+        if (x > 0)
+        {
+            neighbourCellCount += tileset[y * horizontalTileCount + (x - 1)].textureIdx;
+
+            if (y > 0)
+            {
+                neighbourCellCount += tileset[(y - 1) * horizontalTileCount + (x - 1)].textureIdx;
+            }
+        }
+
+        if (y > 0)
+        {
+            neighbourCellCount += tileset[(y - 1) * horizontalTileCount + x].textureIdx;
+            if (x < horizontalTileCount - 1)
+            {
+                neighbourCellCount += tileset[(y - 1) * horizontalTileCount + (x + 1)].textureIdx;
+            }
+        }
+
+        if (x < horizontalTileCount - 1)
+        {
+            neighbourCellCount += tileset[y * horizontalTileCount + (x + 1)].textureIdx;
+            if (y < verticalTilecount - 1)
+            {
+                neighbourCellCount += tileset[(y + 1) * horizontalTileCount + (x + 1)].textureIdx;
+            }
+        }
+
+        if (y < verticalTilecount - 1)
+        {
+            neighbourCellCount += tileset[(y + 1) * horizontalTileCount + x].textureIdx;
+            if (x > 0)
+            {
+                neighbourCellCount += tileset[(y + 1) * horizontalTileCount + (x - 1)].textureIdx;
+            }
+        }
+
+        return neighbourCellCount;
+    }
+
     void Generate()
     {
+        Clear();
+        Random random = new Random();
         for(int i = 0; i < horizontalTileCount; i++)
         {
-            int neighboorCount = 0;
-            for(int j = 0; j < vertocalTileCount; j++)
+            for(int j = 0; j < verticalTilecount; j++)
             {
-                BaseTile tile = GetTile(new Vector2(i, j));
-
-                // only check for horizontal and vertical neighboors
-                for(int i_prime = -1; i_prime <= 1; i_prime++)
-                {
-                    for(int j_prime = -1; j_prime <= 1; j_prime++)
-                    {
-                        BaseTile compareTile = GetTile(new Vector2(i, j));
-
-                        if(tile.textureIdx == compareTile.textureIdx)
-                        {   
-                            neighboorCount++;
-                        }
-                    }    
-                }
-
-                if(neighboorCount > 2)
-                {
-                    tile.SetTexture(0);                   
-                }
+                int rnd = random.Next(0, 2);
+                createTile(rnd, new Vector2(i, j));
             }
-        }    
+        } 
     }
 
     void Clear()
     {
-        GD.Print("Clear btn");        
+        if(tileset.Count <= 0)
+            return;
+        for(int i = 0; i < horizontalTileCount; i++)
+        {
+            for(int j = 0; j < verticalTilecount; j++)
+            {
+                tileset[j * horizontalTileCount + i].QueueFree();           
+            }
+        }    
+        tileset.Clear();
     }
 
     void ApplyAlgo()
     {
-        GD.Print("Algo btn");        
+        int[] nextStates = new int[tileset.Count];
+
+        for(int i = 0; i < horizontalTileCount; i++)
+        {
+            for(int j = 0; j < verticalTilecount; j++)
+            {
+                int neighboors = GetNeighbourCellCount(i, j);
+                BaseTile tile = GetTile(new Vector2(i, j));
+
+                nextStates[j * horizontalTileCount + i] = (neighboors >= _liveNeighboursRequired) ? 1 : 0;
+            }
+        }    
+
+        for(int i = 0; i < tileset.Count; i++)
+        {
+            tileset[i].textureIdx = nextStates[i];
+            tileset[i].SetTexture(nextStates[i]);          
+        }
     }
 }
