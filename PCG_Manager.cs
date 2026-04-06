@@ -6,8 +6,8 @@ public partial class PCG_Manager : Node2D
 {
     [Export] private PackedScene baseTileScene;
     private List<BaseTile> tileset = new List<BaseTile>();
-    private const int horizontalTileCount = 18;
-    private const int verticalTilecount = 10;
+    private const int horizontalTileCount = 70;
+    private const int verticalTilecount = 110;
     private int _liveNeighboursRequired = 4;
 
     public BaseTile GetTile(Vector2 pos)
@@ -19,12 +19,9 @@ public partial class PCG_Manager : Node2D
     private void createTile(int textureIdx, Vector2 pos)
     {
         BaseTile tile = baseTileScene.Instantiate<BaseTile>();
-
         AddChild(tile);
-
         tile.SetTexture(textureIdx);
-        tile.SetPosition(pos);
-
+        tile.SetPosition(new Vector2(pos.X / 5.8f - 0.4f, pos.Y / 5.8f - 0.4f));
         tileset.Add(tile);
     }
 
@@ -77,9 +74,9 @@ public partial class PCG_Manager : Node2D
     {
         Clear();
         Random random = new Random();
-        for(int i = 0; i < horizontalTileCount; i++)
+        for(int i = 0; i < verticalTilecount; i++)
         {
-            for(int j = 0; j < verticalTilecount; j++)
+            for(int j = 0; j < horizontalTileCount; j++)
             {
                 int rnd = random.Next(0, 2);
                 createTile(rnd, new Vector2(i, j));
@@ -91,9 +88,9 @@ public partial class PCG_Manager : Node2D
     {
         if(tileset.Count <= 0)
             return;
-        for(int i = 0; i < horizontalTileCount; i++)
+        for(int i = 0; i < verticalTilecount; i++)
         {
-            for(int j = 0; j < verticalTilecount; j++)
+            for(int j = 0; j < horizontalTileCount; j++)
             {
                 tileset[j * horizontalTileCount + i].QueueFree();           
             }
@@ -109,9 +106,8 @@ public partial class PCG_Manager : Node2D
         {
             for(int j = 0; j < verticalTilecount; j++)
             {
-                int neighboors = GetNeighbourCellCount(i, j);
                 BaseTile tile = GetTile(new Vector2(i, j));
-
+                int neighboors = GetNeighbourCellCount(i, j);
                 nextStates[j * horizontalTileCount + i] = (neighboors >= _liveNeighboursRequired) ? 1 : 0;
             }
         }    
